@@ -32,6 +32,7 @@ final class AccessibilityWindowService {
 
         let cgRuntimeWindows: [RuntimeWindow] = visibleCGWindows.compactMap { cgWindow in
             guard let app = runningAppsByPID[cgWindow.pid] else { return nil }
+            guard app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return nil }
 
             let appElement = AXUIElementCreateApplication(cgWindow.pid)
             let matchingElement = findMatchingAXWindow(

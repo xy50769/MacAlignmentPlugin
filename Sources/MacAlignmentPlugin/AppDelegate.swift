@@ -91,7 +91,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         panel.contentViewController = hostingController
         panel.isReleasedWhenClosed = false
         panel.isMovableByWindowBackground = true
-        panel.titlebarAppearsTransparent = true
+        panel.titlebarAppearsTransparent = false
         panel.delegate = self
         panel.center()
         return panel
