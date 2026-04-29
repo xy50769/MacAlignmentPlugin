@@ -11,12 +11,12 @@ struct ContentView: View {
 
             HStack(spacing: 0) {
                 windowList
-                    .frame(minWidth: 430)
+                    .frame(minWidth: 620)
 
                 Divider()
 
                 controls
-                    .frame(width: 300)
+                    .frame(width: 360)
             }
 
             Divider()
@@ -75,91 +75,93 @@ struct ContentView: View {
     }
 
     private var controls: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            permissionBox
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                permissionBox
 
-            GroupBox("Layouts") {
-                VStack(alignment: .leading, spacing: 10) {
-                    TextField("Layout name", text: $viewModel.layoutName)
+                GroupBox("Layouts") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        TextField("Layout name", text: $viewModel.layoutName)
 
-                    Picker("Saved", selection: $viewModel.selectedLayoutID) {
-                        Text("Choose layout").tag(UUID?.none)
-                        ForEach(viewModel.layouts) { layout in
-                            Text(layout.name).tag(Optional(layout.id))
+                        Picker("Saved", selection: $viewModel.selectedLayoutID) {
+                            Text("Choose layout").tag(UUID?.none)
+                            ForEach(viewModel.layouts) { layout in
+                                Text(layout.name).tag(Optional(layout.id))
+                            }
                         }
-                    }
 
-                    HStack {
-                        Button {
-                            viewModel.saveCurrentLayout()
+                        HStack {
+                            Button {
+                                viewModel.saveCurrentLayout()
+                            } label: {
+                                Label("Save", systemImage: "square.and.arrow.down")
+                            }
+                            Button {
+                                viewModel.applySelectedLayout()
+                            } label: {
+                                Label("Apply", systemImage: "rectangle.on.rectangle")
+                            }
+                        }
+
+                        Button(role: .destructive) {
+                            viewModel.deleteSelectedLayout()
                         } label: {
-                            Label("Save", systemImage: "square.and.arrow.down")
+                            Label("Delete Layout", systemImage: "trash")
                         }
+                        .disabled(viewModel.selectedLayoutID == nil)
+                    }
+                    .padding(4)
+                }
+
+                GroupBox("Quick Size") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Picker("Preset", selection: $viewModel.selectedPreset) {
+                            ForEach(SizePreset.allCases) { preset in
+                                Text(preset.rawValue).tag(preset)
+                            }
+                        }
+
                         Button {
-                            viewModel.applySelectedLayout()
+                            viewModel.resizeSelectedToPreset()
                         } label: {
-                            Label("Apply", systemImage: "rectangle.on.rectangle")
+                            Label("Apply Preset", systemImage: "arrow.up.left.and.arrow.down.right")
+                        }
+
+                        HStack {
+                            TextField("Width", value: $viewModel.customWidth, format: .number)
+                            TextField("Height", value: $viewModel.customHeight, format: .number)
+                        }
+
+                        Button {
+                            viewModel.resizeSelectedToCustomSize()
+                        } label: {
+                            Label("Apply Custom Size", systemImage: "slider.horizontal.3")
                         }
                     }
-
-                    Button(role: .destructive) {
-                        viewModel.deleteSelectedLayout()
-                    } label: {
-                        Label("Delete Layout", systemImage: "trash")
-                    }
-                    .disabled(viewModel.selectedLayoutID == nil)
+                    .padding(4)
                 }
-                .padding(4)
-            }
 
-            GroupBox("Quick Size") {
-                VStack(alignment: .leading, spacing: 10) {
-                    Picker("Preset", selection: $viewModel.selectedPreset) {
-                        ForEach(SizePreset.allCases) { preset in
-                            Text(preset.rawValue).tag(preset)
+                GroupBox("Align") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(viewModel.anchorWindow.map { "Anchor: \($0.appName)  x \(Int($0.frame.x)), y \(Int($0.frame.y))" } ?? "No anchor selected")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+
+                        Button {
+                            viewModel.alignSelectedToAnchor()
+                        } label: {
+                            Label("Align to Anchor", systemImage: "align.horizontal.left")
                         }
+                        .disabled(viewModel.anchorWindowID == nil || viewModel.selectedWindowIDs.isEmpty)
                     }
-
-                    Button {
-                        viewModel.resizeSelectedToPreset()
-                    } label: {
-                        Label("Apply Preset", systemImage: "arrow.up.left.and.arrow.down.right")
-                    }
-
-                    HStack {
-                        TextField("Width", value: $viewModel.customWidth, format: .number)
-                        TextField("Height", value: $viewModel.customHeight, format: .number)
-                    }
-
-                    Button {
-                        viewModel.resizeSelectedToCustomSize()
-                    } label: {
-                        Label("Apply Custom Size", systemImage: "slider.horizontal.3")
-                    }
+                    .padding(4)
                 }
-                .padding(4)
+
+                Spacer(minLength: 0)
             }
-
-            GroupBox("Align") {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(viewModel.anchorWindow.map { "Anchor: \($0.appName)  x \(Int($0.frame.x)), y \(Int($0.frame.y))" } ?? "No anchor selected")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-
-                    Button {
-                        viewModel.alignSelectedToAnchor()
-                    } label: {
-                        Label("Align to Anchor", systemImage: "align.horizontal.left")
-                    }
-                    .disabled(viewModel.anchorWindowID == nil || viewModel.selectedWindowIDs.isEmpty)
-                }
-                .padding(4)
-            }
-
-            Spacer()
+            .padding(14)
         }
-        .padding(14)
     }
 
     @ViewBuilder
