@@ -11,6 +11,7 @@ final class AlignmentViewModel: ObservableObject {
     @Published var selectedPreset: SizePreset = .wide
     @Published var customWidth: Double = 1200
     @Published var customHeight: Double = 800
+    @Published var anchorWindowID: String?
     @Published private(set) var hasAccessibilityPermission = false
     @Published var statusMessage: String = "Ready"
 
@@ -32,6 +33,10 @@ final class AlignmentViewModel: ObservableObject {
         layouts.first { $0.id == selectedLayoutID }
     }
 
+    var anchorWindow: WindowSnapshot? {
+        windows.first { $0.id == anchorWindowID }
+    }
+
     var permissionDiagnostic: String {
         let bundlePath = Bundle.main.bundlePath
         let pid = ProcessInfo.processInfo.processIdentifier
@@ -41,6 +46,9 @@ final class AlignmentViewModel: ObservableObject {
     func refresh() {
         let selectedSignatures = windows
             .filter { selectedWindowIDs.contains($0.id) }
+            .map(stableSelectionSignature(for:))
+        let anchorSignature = windows
+            .first { $0.id == anchorWindowID }
             .map(stableSelectionSignature(for:))
 
         hasAccessibilityPermission = accessibility.isTrusted()
@@ -52,6 +60,11 @@ final class AlignmentViewModel: ObservableObject {
                 .filter { selectedSignatures.contains(stableSelectionSignature(for: $0)) }
                 .map(\.id)
         )
+        if let previousAnchor = windows.first(where: { stableSelectionSignature(for: $0) == anchorSignature }) {
+            anchorWindowID = previousAnchor.id
+        } else if let anchorWindowID, !windows.contains(where: { $0.id == anchorWindowID }) {
+            self.anchorWindowID = nil
+        }
         statusMessage = "Found \(windows.count) visible windows"
     }
 
@@ -84,6 +97,39 @@ final class AlignmentViewModel: ObservableObject {
 
     func clearSelection() {
         selectedWindowIDs.removeAll()
+    }
+
+    func setAnchorWindow(_ window: WindowSnapshot) {
+        guard window.isAdjustable else { return }
+        anchorWindowID = window.id
+        statusMessage = "Anchor set to \(window.appName) at x \(Int(window.frame.x)), y \(Int(window.frame.y))"
+    }
+
+    func alignSelectedToAnchor() {
+        guard let anchorWindow else {
+            statusMessage = "Choose an anchor window first"
+            return
+        }
+
+        let selectedRuntimeWindows = selectedWindowIDs.compactMap { runtimeWindowsByID[$0] }
+        guard !selectedRuntimeWindows.isEmpty else {
+            statusMessage = "Select at least one adjustable window"
+            return
+        }
+
+        let anchorOrigin = anchorWindow.frame.cgRect.origin
+        var alignedCount = 0
+
+        for runtimeWindow in selectedRuntimeWindows {
+            var frame = runtimeWindow.snapshot.frame.cgRect
+            frame.origin = anchorOrigin
+            if accessibility.apply(frame: frame, to: runtimeWindow) {
+                alignedCount += 1
+            }
+        }
+
+        statusMessage = "Aligned \(alignedCount) windows to \(anchorWindow.appName)'s top-left point"
+        refresh()
     }
 
     func saveCurrentLayout() {

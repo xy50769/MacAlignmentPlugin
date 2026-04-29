@@ -25,10 +25,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         hidePanel()
     }
 
-    func windowDidResignKey(_ notification: Notification) {
-        hidePanel()
-    }
-
     @objc private func togglePanel() {
         if panel?.isVisible == true {
             hidePanel()

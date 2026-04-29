@@ -61,7 +61,11 @@ struct ContentView: View {
             List(viewModel.windows) { window in
                 WindowRow(
                     window: window,
-                    isSelected: viewModel.selectedWindowIDs.contains(window.id)
+                    isSelected: viewModel.selectedWindowIDs.contains(window.id),
+                    isAnchor: viewModel.anchorWindowID == window.id,
+                    onSetAnchor: {
+                        viewModel.setAnchorWindow(window)
+                    }
                 ) {
                     viewModel.toggleSelection(for: window)
                 }
@@ -136,6 +140,23 @@ struct ContentView: View {
                 .padding(4)
             }
 
+            GroupBox("Align") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(viewModel.anchorWindow.map { "Anchor: \($0.appName)  x \(Int($0.frame.x)), y \(Int($0.frame.y))" } ?? "No anchor selected")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+
+                    Button {
+                        viewModel.alignSelectedToAnchor()
+                    } label: {
+                        Label("Align to Anchor", systemImage: "align.horizontal.left")
+                    }
+                    .disabled(viewModel.anchorWindowID == nil || viewModel.selectedWindowIDs.isEmpty)
+                }
+                .padding(4)
+            }
+
             Spacer()
         }
         .padding(14)
@@ -199,47 +220,72 @@ struct ContentView: View {
 private struct WindowRow: View {
     let window: WindowSnapshot
     let isSelected: Bool
+    let isAnchor: Bool
+    let onSetAnchor: () -> Void
     let onToggle: () -> Void
 
     var body: some View {
-        Button(action: onToggle) {
-            HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: 10) {
+            Button(action: onToggle) {
                 Image(systemName: isSelected ? "checkmark.square.fill" : "square")
                     .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
                     .font(.title3)
+            }
+            .buttonStyle(.plain)
+            .disabled(!window.isAdjustable)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(window.appName)
-                            .font(.headline)
-                        Spacer()
-                        Text("\(Int(window.frame.width)) x \(Int(window.frame.height))")
-                            .font(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
+            Button(action: onToggle) {
+                rowContent
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(!window.isAdjustable)
+            .opacity(window.isAdjustable ? 1 : 0.55)
 
-                    Text(window.title)
-                        .font(.callout)
-                        .lineLimit(1)
+            Button(action: onSetAnchor) {
+                Image(systemName: isAnchor ? "scope" : "scope")
+                    .foregroundStyle(isAnchor ? Color.accentColor : Color.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Set as anchor")
+            .disabled(!window.isAdjustable)
+            .opacity(window.isAdjustable ? 1 : 0.45)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var rowContent: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(window.appName)
+                    .font(.headline)
+                if isAnchor {
+                    Text("Anchor")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-
-                    HStack(spacing: 8) {
-                        Text("x \(Int(window.frame.x)), y \(Int(window.frame.y))")
-                        if let skipReason = window.skipReason {
-                            Text(skipReason)
-                                .foregroundStyle(.orange)
-                        }
-                    }
+                }
+                Spacer()
+                Text("\(Int(window.frame.width)) x \(Int(window.frame.height))")
                     .font(.caption)
+                    .monospacedDigit()
                     .foregroundStyle(.secondary)
+            }
+
+            Text(window.title)
+                .font(.callout)
+                .lineLimit(1)
+                .foregroundStyle(.secondary)
+
+            HStack(alignment: .top, spacing: 10) {
+                Text("x \(Int(window.frame.x)), y \(Int(window.frame.y))")
+                if let skipReason = window.skipReason {
+                    Text(skipReason)
+                        .foregroundStyle(.orange)
                 }
             }
-            .contentShape(Rectangle())
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
-        .buttonStyle(.plain)
-        .disabled(!window.isAdjustable)
-        .opacity(window.isAdjustable ? 1 : 0.55)
-        .padding(.vertical, 4)
     }
 }

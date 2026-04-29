@@ -13,6 +13,7 @@ It is built for workflows where you want several apps, such as Terminal, Finder,
 - Saves selected window positions and sizes as reusable layout presets.
 - Applies saved layouts to selected windows.
 - Supports quick resizing with built-in presets or custom width and height.
+- Aligns selected windows to a chosen anchor window's top-left point.
 - Keeps the window's top-left position when resizing.
 - Clamps oversized windows to the visible screen area.
 - Skips full-screen, minimized, system-only, and non-adjustable windows.
@@ -110,6 +111,14 @@ The app matches selected windows by bundle identifier and title where possible.
 3. Click `Apply Preset` or `Apply Custom Size`.
 
 Quick Resize keeps each window's top-left point fixed. If the requested size would extend beyond the visible screen area, the app uses the largest size that fits.
+
+### Align to an Anchor Window
+
+1. In the window list, click the scope icon on the row you want to use as the anchor.
+2. Select the windows you want to move.
+3. Click `Align to Anchor`.
+
+All selected windows move so their top-left point matches the anchor window's top-left point. Their sizes are preserved.
 
 ## Stage Manager Notes
 
