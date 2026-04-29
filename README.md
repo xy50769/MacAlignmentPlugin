@@ -7,6 +7,7 @@ It is built for workflows where you want several apps, such as Terminal, Finder,
 ## Features
 
 - Menu bar utility with a movable floating control window.
+- Custom Launchpad and Dock app icon.
 - Lists adjustable macOS windows from the current workspace.
 - Supports manual per-window selection.
 - Saves selected window positions and sizes as reusable layout presets.
