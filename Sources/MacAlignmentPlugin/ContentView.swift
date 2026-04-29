@@ -11,12 +11,12 @@ struct ContentView: View {
 
             HStack(spacing: 0) {
                 windowList
-                    .frame(minWidth: 620)
+                    .frame(minWidth: 430)
 
                 Divider()
 
                 controls
-                    .frame(width: 360)
+                    .frame(width: 300)
             }
 
             Divider()
@@ -76,7 +76,7 @@ struct ContentView: View {
 
     private var controls: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 permissionBox
 
                 GroupBox("Layouts") {
@@ -160,7 +160,7 @@ struct ContentView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(14)
+            .padding(12)
         }
     }
 

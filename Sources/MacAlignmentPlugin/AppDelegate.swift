@@ -78,11 +78,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let hostingController = NSHostingController(
             rootView: ContentView()
                 .environmentObject(viewModel)
-                .frame(minWidth: 1040, minHeight: 740)
+                .frame(minWidth: 760, minHeight: 560)
         )
 
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 1080, height: 780),
+            contentRect: NSRect(x: 0, y: 0, width: 760, height: 560),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -92,7 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         panel.isReleasedWhenClosed = false
         panel.isMovableByWindowBackground = true
         panel.titlebarAppearsTransparent = false
-        panel.minSize = NSSize(width: 1040, height: 740)
+        panel.minSize = NSSize(width: 760, height: 560)
         panel.delegate = self
         panel.center()
         return panel
