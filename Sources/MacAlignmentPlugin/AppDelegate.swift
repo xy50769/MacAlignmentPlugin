@@ -8,7 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var panel: NSPanel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
+        hideDockIcon()
         createStatusItem()
         showPanel()
     }
@@ -22,16 +22,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        panel?.orderOut(nil)
+        hidePanel()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        panel?.orderOut(nil)
+        hidePanel()
     }
 
     @objc private func togglePanel() {
         if panel?.isVisible == true {
-            panel?.orderOut(nil)
+            hidePanel()
         } else {
             showPanel()
         }
@@ -55,9 +55,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
 
         guard let panel else { return }
+        showDockIcon()
         viewModel.refresh()
         panel.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func hidePanel() {
+        panel?.orderOut(nil)
+        hideDockIcon()
+    }
+
+    private func showDockIcon() {
+        if NSApp.activationPolicy() != .regular {
+            NSApp.setActivationPolicy(.regular)
+        }
+    }
+
+    private func hideDockIcon() {
+        if NSApp.activationPolicy() != .accessory {
+            NSApp.setActivationPolicy(.accessory)
+        }
     }
 
     private func makePanel() -> NSPanel {

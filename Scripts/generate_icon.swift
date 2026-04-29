@@ -30,19 +30,19 @@ func drawIcon(size: CGFloat) -> NSImage {
     outer.addClip()
 
     let backgroundGradient = NSGradient(colors: [
-        NSColor(calibratedRed: 0.035, green: 0.047, blue: 0.070, alpha: 1),
-        NSColor(calibratedRed: 0.055, green: 0.095, blue: 0.125, alpha: 1),
-        NSColor(calibratedRed: 0.020, green: 0.026, blue: 0.040, alpha: 1)
+        NSColor(calibratedRed: 0.055, green: 0.058, blue: 0.075, alpha: 1),
+        NSColor(calibratedRed: 0.100, green: 0.112, blue: 0.145, alpha: 1),
+        NSColor(calibratedRed: 0.025, green: 0.028, blue: 0.040, alpha: 1)
     ])
     backgroundGradient?.draw(in: canvas, angle: 315)
 
-    let cyanGlow = NSBezierPath(ovalIn: NSRect(x: u(110), y: u(610), width: u(760), height: u(360)))
-    NSColor(calibratedRed: 0.11, green: 0.58, blue: 0.90, alpha: 0.20).setFill()
-    cyanGlow.fill()
+    let blueSheen = NSBezierPath(ovalIn: NSRect(x: u(104), y: u(612), width: u(760), height: u(360)))
+    NSColor(calibratedRed: 0.22, green: 0.38, blue: 0.64, alpha: 0.20).setFill()
+    blueSheen.fill()
 
-    let greenGlow = NSBezierPath(ovalIn: NSRect(x: u(70), y: u(100), width: u(680), height: u(420)))
-    NSColor(calibratedRed: 0.12, green: 0.88, blue: 0.52, alpha: 0.16).setFill()
-    greenGlow.fill()
+    let warmSheen = NSBezierPath(ovalIn: NSRect(x: u(96), y: u(92), width: u(690), height: u(430)))
+    NSColor(calibratedRed: 0.78, green: 0.62, blue: 0.38, alpha: 0.14).setFill()
+    warmSheen.fill()
 
     NSGraphicsContext.current?.restoreGraphicsState()
 
@@ -53,7 +53,7 @@ func drawIcon(size: CGFloat) -> NSImage {
 
     let anchorX = u(214)
     let anchorY = u(238)
-    let guideColor = NSColor(calibratedRed: 0.23, green: 0.96, blue: 0.55, alpha: 1)
+    let guideColor = NSColor(calibratedRed: 0.82, green: 0.70, blue: 0.50, alpha: 1)
 
     let verticalGuide = NSBezierPath()
     verticalGuide.move(to: NSPoint(x: anchorX, y: anchorY))
@@ -71,8 +71,11 @@ func drawIcon(size: CGFloat) -> NSImage {
     guideColor.setStroke()
     horizontalGuide.stroke()
 
-    guideColor.setFill()
-    NSBezierPath(ovalIn: NSRect(x: anchorX - u(29), y: anchorY - u(29), width: u(58), height: u(58))).fill()
+    let anchorGradient = NSGradient(colors: [
+        NSColor(calibratedRed: 0.95, green: 0.84, blue: 0.62, alpha: 1),
+        NSColor(calibratedRed: 0.62, green: 0.50, blue: 0.35, alpha: 1)
+    ])
+    anchorGradient?.draw(in: NSBezierPath(ovalIn: NSRect(x: anchorX - u(30), y: anchorY - u(30), width: u(60), height: u(60))), angle: 90)
 
     func drawWindow(_ frame: NSRect, active: Bool) {
         NSGraphicsContext.current?.saveGraphicsState()
@@ -83,7 +86,7 @@ func drawIcon(size: CGFloat) -> NSImage {
         shadow.set()
 
         let shape = NSBezierPath(roundedRect: frame, xRadius: u(42), yRadius: u(42))
-        NSColor(calibratedWhite: active ? 0.98 : 0.88, alpha: active ? 0.24 : 0.15).setFill()
+        NSColor(calibratedRed: 0.93, green: 0.96, blue: 1.0, alpha: active ? 0.24 : 0.14).setFill()
         shape.fill()
         NSGraphicsContext.current?.restoreGraphicsState()
 
@@ -95,13 +98,13 @@ func drawIcon(size: CGFloat) -> NSImage {
             NSColor.white.withAlphaComponent(active ? 0.10 : 0.07)
         ])?.draw(in: frame, angle: 90)
 
-        NSColor.white.withAlphaComponent(active ? 0.20 : 0.12).setFill()
+        NSColor.white.withAlphaComponent(active ? 0.18 : 0.10).setFill()
         NSRect(x: frame.minX, y: frame.maxY - u(78), width: frame.width, height: u(78)).fill()
         NSGraphicsContext.current?.restoreGraphicsState()
 
         let stroke = NSBezierPath(roundedRect: frame, xRadius: u(42), yRadius: u(42))
         stroke.lineWidth = u(active ? 10 : 8)
-        NSColor.white.withAlphaComponent(active ? 0.72 : 0.44).setStroke()
+        NSColor(calibratedRed: 0.93, green: 0.96, blue: 1.0, alpha: active ? 0.70 : 0.42).setStroke()
         stroke.stroke()
 
         for index in 0..<3 {
@@ -121,15 +124,15 @@ func drawIcon(size: CGFloat) -> NSImage {
     drawWindow(NSRect(x: u(236), y: u(316), width: u(322), height: u(226)), active: false)
     drawWindow(NSRect(x: u(548), y: u(288), width: u(300), height: u(220)), active: false)
 
-    let sparkle = NSBezierPath()
-    sparkle.move(to: NSPoint(x: u(790), y: u(770)))
-    sparkle.line(to: NSPoint(x: u(822), y: u(822)))
-    sparkle.move(to: NSPoint(x: u(822), y: u(770)))
-    sparkle.line(to: NSPoint(x: u(790), y: u(822)))
-    sparkle.lineWidth = u(12)
-    sparkle.lineCapStyle = .round
-    NSColor.white.withAlphaComponent(0.60).setStroke()
-    sparkle.stroke()
+    let cornerMark = NSBezierPath()
+    cornerMark.move(to: NSPoint(x: u(760), y: u(788)))
+    cornerMark.line(to: NSPoint(x: u(824), y: u(788)))
+    cornerMark.line(to: NSPoint(x: u(824), y: u(724)))
+    cornerMark.lineWidth = u(14)
+    cornerMark.lineCapStyle = .round
+    cornerMark.lineJoinStyle = .round
+    NSColor(calibratedRed: 0.82, green: 0.70, blue: 0.50, alpha: 0.82).setStroke()
+    cornerMark.stroke()
 
     return image
 }
